@@ -1,4 +1,4 @@
-"""# ==========================================================
+# ==========================================================
 # SIMULADOR INTERACTIVO DE RESPUESTA SÍSMICA SDOF
 # Optimizado para Streamlit Cloud
 # Sistema de Un Grado de Libertad
@@ -43,42 +43,6 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# Mejorar visibilidad de st.metric (Opción A)
-st.markdown("""
-<style>
-/* Estilos para mejorar visibilidad de st.metric */
-div[data-testid="metric-container"] {
-  background-color: #ffffff !important;
-  border-radius: 12px;
-  padding: 8px 12px;
-  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.06);
-}
-div[data-testid="metric-container"] .stMetricValue {
-  color: #0f172a !important;
-  font-weight: 700 !important;
-  font-size: 1.1rem !important;
-}
-div[data-testid="metric-container"] .stMetricDelta {
-  color: #475569 !important;
-  font-weight: 600 !important;
-}
-
-/* Ajustes para modo oscuro */
-@media (prefers-color-scheme: dark) {
-  div[data-testid="metric-container"] {
-    background-color: #0b1220 !important;
-    box-shadow: 0 6px 16px rgba(0,0,0,0.6);
-  }
-  div[data-testid="metric-container"] .stMetricValue {
-    color: #e6eef8 !important;
-  }
-  div[data-testid="metric-container"] .stMetricDelta {
-    color: #9aa7b8 !important;
-  }
-}
-</style>
-""", unsafe_allow_html=True)
-
 # ===========================================
 # Función Ricker para simular pulsos sísmicos
 # ===========================================
@@ -101,7 +65,7 @@ with col2:
 with col3:
     # Link al visualizador web (actualizar con tu URL de GitHub Pages)
     st.markdown("### 🎬")
-    st.markdown("[Ver Animación →](https://andrix1515.github.io/TERREMOTO/simulator.html)", 
+    st.markdown("[Ver Animación →](https://tu-usuario.github.io/seismic-simulator/simulator.html)", 
                 unsafe_allow_html=True)
 
 # =============================
@@ -422,4 +386,3 @@ with col2:
     st.caption("📊 Análisis de respuesta sísmica SDOF")
 with col3:
     st.caption(f"v1.0 - {T}s @ {intensidad:.1f}x intensidad")
-"""
