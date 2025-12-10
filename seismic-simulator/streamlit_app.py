@@ -65,7 +65,7 @@ with col2:
 with col3:
     # Link al visualizador web (actualizar con tu URL de GitHub Pages)
     st.markdown("### 🎬")
-    st.markdown("[Ver Animación →](https://tu-usuario.github.io/seismic-simulator/simulator.html)", 
+    st.markdown("[Ver Animación →](https://andrix1515.github.io/TERREMOTO/simulator.html)", 
                 unsafe_allow_html=True)
 
 # =============================
@@ -386,3 +386,4 @@ with col2:
     st.caption("📊 Análisis de respuesta sísmica SDOF")
 with col3:
     st.caption(f"v1.0 - {T}s @ {intensidad:.1f}x intensidad")
+
