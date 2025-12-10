@@ -1,0 +1,59 @@
+[theme]
+# Color primario - azul eléctrico
+primaryColor = "#3b82f6"
+
+# Color de fondo principal - azul oscuro
+backgroundColor = "#0f172a"
+
+# Color de fondo secundario - gris azulado
+secondaryBackgroundColor = "#1e293b"
+
+# Color del texto
+textColor = "#f1f5f9"
+
+# Fuente
+font = "sans serif"
+
+[server]
+# Modo headless para deployment
+headless = true
+
+# Puerto por defecto
+port = 8501
+
+# Deshabilitar CORS para producción
+enableCORS = false
+
+# Habilitar XSRF protection
+enableXsrfProtection = true
+
+[browser]
+# Recopilar estadísticas de uso
+gatherUsageStats = true
+
+# Color del servidor cuando está corriendo
+serverAddress = "localhost"
+
+# Puerto del servidor
+serverPort = 8501
+
+[runner]
+# Ejecutar el script automáticamente cuando hay cambios
+fastReruns = true
+
+# Tiempo máximo de ejecución (en segundos)
+maxRunTime = 300
+
+[client]
+# Mostrar error details
+showErrorDetails = true
+
+# Toolbar mode
+toolbarMode = "auto"
+
+[logger]
+# Nivel de logging
+level = "info"
+
+# Formato del mensaje
+messageFormat = "%(asctime)s %(message)s"
