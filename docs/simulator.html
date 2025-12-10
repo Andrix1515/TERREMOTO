@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador Sísmico de Estructuras</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --primary-light: #3b82f6;
+            --secondary: #10b981;
+            --accent: #f59e0b;
+            --danger: #ef4444;
+            --bg-dark: #0f172a;
+            --bg-darker: #020617;
+            --bg-card: #1e293b;
+            --border: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--bg-darker) 0%, var(--bg-dark) 100%);
+            color: var(--text-primary);
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+            width: 100%;
+        }
+
+        .sidebar {
+            width: 320px;
+            background: var(--bg-card);
+            border-right: 1px solid var(--border);
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .header {
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title {
+            font-size: 24px;
+            font-weight: bold;
+            background: linear-gradient(135deg, var(--primary-light), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-subtitle {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .back-button {
+            padding: 8px 16px;
+            background: var(--bg-darker);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 13px;
+            transition: all 0.3s ease;
+        }
+
+        .back-button:hover {
+            background: var(--border);
+            transform: translateX(-3px);
+        }
+
+        .content {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        .animation-panel {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            overflow-y: auto;
+        }
+
+        .canvas-container {
+            flex: 1;
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            margin-bottom: 15px;
+            min-height: 400px;
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+        }
+
+        .control-section {
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        .control-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--primary-light);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .slider-group {
+            margin-bottom: 15px;
+        }
+
+        .slider-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+
+        .slider-label span:last-child {
+            color: var(--primary-light);
+            font-weight: 600;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--accent);
+            cursor: pointer;
+            box-shadow: 0 0 8px rgba(245, 158, 11, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--accent);
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 0 8px rgba(245, 158, 11, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            box-shadow: 0 0 12px rgba(245, 158, 11, 0.8);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            box-shadow: 0 0 12px rgba(37, 99, 235, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+
+        .btn-secondary {
+            background: var(--bg-darker);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+
+        .timeline {
+            width: 100%;
+            height: 30px;
+            background: var(--bg-darker);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            position: relative;
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        .timeline-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 6px;
+            position: relative;
+            transition: width 0.05s linear;
+        }
+
+        .timeline-label {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-primary);
+            pointer-events: none;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .stat-card {
+            background: var(--bg-darker);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            font-size: 16px;
+            font-weight: bold;
+            color: var(--primary-light);
+        }
+
+        .stat-unit {
+            font-size: 10px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-dark);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                max-height: 50vh;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div>
+                <h3 class="header-title">Parámetros</h3>
+                <p class="header-subtitle">Ajusta los parámetros del sistema</p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Freq. Natural</div>
+                    <div class="stat-value" id="freqNatural">2.83</div>
+                    <div class="stat-unit">rad/s</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Amortiguamiento</div>
+                    <div class="stat-value" id="dampingRatio">0.177</div>
+                    <div class="stat-unit">ζ</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Período</div>
+                    <div class="stat-value" id="period">2.22</div>
+                    <div class="stat-unit">s</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Tiempo Actual</div>
+                    <div class="stat-value" id="currentTime">0.00</div>
+                    <div class="stat-unit">s</div>
+                </div>
+            </div>
+
+            <div class="control-section">
+                <div class="control-title">⚙️ Estructura</div>
+                <div class="slider-group">
+                    <div class="slider-label">
+                        <span>Masa (kg)</span>
+                        <span id="massValue">1000</span>
+                    </div>
+                    <input type="range" id="mass" min="500" max="5000" step="100" value="1000">
+                </div>
+                <div class="slider-group">
+                    <div class="slider-label">
+                        <span>Rigidez (N/m)</span>
+                        <span id="stiffnessValue">8000</span>
+                    </div>
+                    <input type="range" id="stiffness" min="1000" max="20000" step="100" value="8000">
+                </div>
+                <div class="slider-group">
+                    <div class="slider-label">
+                        <span>Amortiguamiento (N·s/m)</span>
+                        <span id="dampingValue">1000</span>
+                    </div>
+                    <input type="range" id="damping" min="0" max="5000" step="100" value="1000">
+                </div>
+            </div>
+
+            <div class="control-section">
+                <div class="control-title">🌊 Onda Sísmica</div>
+                <div class="slider-group">
+                    <div class="slider-label">
+                        <span>Amplitud (m)</span>
+                        <span id="amplitudeValue">1.0</span>
+                    </div>
+                    <input type="range" id="amplitude" min="0.1" max="3.0" step="0.1" value="1.0">
+                </div>
+                <div class="slider-group">
+                    <div class="slider-label">
+                        <span>Frecuencia (Hz)</span>
+                        <span id="freqValue">2.0</span>
+                    </div>
+                    <input type="range" id="frequency" min="0.5" max="5.0" step="0.5" value="2.0">
+                </div>
+                <div class="slider-group">
+                    <div class="slider-label">
+                        <span>Duración (s)</span>
+                        <span id="durationValue">10</span>
+                    </div>
+                    <input type="range" id="duration" min="5" max="30" step="1" value="10">
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button class="btn-primary" id="playBtn">▶️ Reproducir</button>
+                <button class="btn-secondary" id="resetBtn">↻ Reiniciar</button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main">
+            <div class="header">
+                <div>
+                    <div class="header-title">Simulador de Respuesta Sísmica SDOF</div>
+                    <div class="header-subtitle">Sistema de Un Grado de Libertad - Análisis Dinámico</div>
+                </div>
+                <a href="index.html" class="back-button">← Volver</a>
+            </div>
+
+            <div class="content">
+                <div class="animation-panel">
+                    <div class="canvas-container">
+                        <canvas id="animationCanvas"></canvas>
+                    </div>
+                    <div class="control-section">
+                        <div class="control-title">⏱️ Línea de Tiempo</div>
+                        <div class="timeline" id="timeline">
+                            <div class="timeline-bar" id="timelineBar"></div>
+                            <div class="timeline-label" id="timelineLabel">0.00 s</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global state
+        const state = {
+            mass: 1000,
+            stiffness: 8000,
+            damping: 1000,
+            amplitude: 1.0,
+            frequency: 2.0,
+            duration: 10,
+            isPlaying: false,
+            currentTime: 0,
+            simData: null,
+            displacement: 0,
+            velocity: 0
+        };
+
+        const canvas = document.getElementById('animationCanvas');
+        const ctx = canvas.getContext('2d');
+        let animationId = null;
+        let lastTime = 0;
+
+        // Resize canvas to fit container
+        function resizeCanvas() {
+            const container = canvas.parentElement;
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        // Update UI values
+        function updateUI() {
+            document.getElementById('massValue').textContent = state.mass;
+            document.getElementById('stiffnessValue').textContent = state.stiffness.toFixed(0);
+            document.getElementById('dampingValue').textContent = state.damping;
+            document.getElementById('amplitudeValue').textContent = state.amplitude.toFixed(1);
+            document.getElementById('freqValue').textContent = state.frequency.toFixed(1);
+            document.getElementById('durationValue').textContent = state.duration;
+            
+            const omegaN = Math.sqrt(state.stiffness / state.mass);
+            const zeta = state.damping / (2 * Math.sqrt(state.mass * state.stiffness));
+            const period = 2 * Math.PI / omegaN;
+            
+            document.getElementById('freqNatural').textContent = omegaN.toFixed(2);
+            document.getElementById('dampingRatio').textContent = zeta.toFixed(3);
+            document.getElementById('period').textContent = period.toFixed(2);
+            document.getElementById('currentTime').textContent = state.currentTime.toFixed(2);
+        }
+
+        // Run simulation
+        function runSimulation() {
+            const dt = 0.01;
+            const N = Math.floor(state.duration / dt);
+            const times = Array.from({ length: N }, (_, i) => i * dt);
+            
+            const displacement = [0];
+            const velocity = [0];
+            
+            let x = 0, v = 0;
+            
+            for (let i = 1; i < N; i++) {
+                const t = times[i];
+                const arg = Math.PI * state.frequency * (t - state.duration/3);
+                const groundAccel = state.amplitude * (1 - 2 * arg * arg) * Math.exp(-arg * arg);
+                
+                const F = -state.mass * groundAccel;
+                const a = (F - state.damping * v - state.stiffness * x) / state.mass;
+                
+                v += a * dt;
+                x += v * dt;
+                
+                displacement.push(x);
+                velocity.push(v);
+            }
+            
+            state.simData = { times, displacement, velocity };
+            state.currentTime = 0;
+            updateUI();
+        }
+
+        // Draw building animations
+        function drawScene() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Background gradient
+            const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            gradient.addColorStop(0, '#1a1f2e');
+            gradient.addColorStop(1, '#16213e');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const scale = 50;
+            
+            // Get displacement from simulation
+            if (state.simData && state.currentTime < state.duration) {
+                const idx = Math.floor((state.currentTime / state.duration) * state.simData.times.length);
+                state.displacement = state.simData.displacement[Math.min(idx, state.simData.displacement.length - 1)] || 0;
+            }
+            
+            const displacement = state.displacement * scale;
+            
+            // Draw ground
+            drawGround(centerY + 100);
+            
+            // Draw buildings with details
+            drawBuilding(centerX - 150, centerY - 80, 80, 180, displacement * 0.8, '#3b82f6');
+            drawBuilding(centerX + 70, centerY - 100, 100, 200, displacement * 1.1, '#10b981');
+            drawBuilding(centerX - 30, centerY - 60, 60, 160, displacement * 0.9, '#f59e0b');
+            
+            // Draw wave propagation
+            drawWave(centerY - 200, state.currentTime / state.duration);
+        }
+
+        function drawBuilding(x, y, width, height, sway, color) {
+            const swayAmount = sway * 0.5;
+            const shakeAmount = Math.sin(state.currentTime * 10) * 2;
+            
+            ctx.save();
+            ctx.translate(x + swayAmount + shakeAmount, y);
+            
+            // Main building structure
+            ctx.fillStyle = color;
+            ctx.fillRect(-width/2, 0, width, height);
+            
+            // Building border
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(-width/2, 0, width, height);
+            
+            // Windows with lights
+            const windowWidth = width / 4;
+            const windowHeight = height / 6;
+            const windowSpacing = 8;
+            
+            for (let row = 0; row < 5; row++) {
+                for (let col = 0; col < 3; col++) {
+                    const windowX = -width/2 + windowSpacing + col * (windowWidth + windowSpacing);
+                    const windowY = windowSpacing + row * (windowHeight + windowSpacing);
+                    
+                    // Window dark
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+                    ctx.fillRect(windowX, windowY, windowWidth - 2, windowHeight - 2);
+                    
+                    // Window light (flickers with animation)
+                    if (Math.random() > 0.3) {
+                        ctx.fillStyle = `rgba(255, 255, 100, ${0.4 + Math.sin(state.currentTime * 3) * 0.2})`;
+                        ctx.fillRect(windowX + 2, windowY + 2, windowWidth - 4, windowHeight - 4);
+                    }
+                }
+            }
+            
+            // Building label
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+            ctx.font = 'bold 12px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(`${(Math.abs(swayAmount)).toFixed(2)} m`, 0, height + 25);
+            
+            ctx.restore();
+        }
+
+        function drawGround(y) {
+            // Ground line
+            ctx.strokeStyle = '#8b7355';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(0, y);
+            ctx.lineTo(canvas.width, y);
+            ctx.stroke();
+            
+            // Ground pattern
+            ctx.fillStyle = 'rgba(139, 115, 85, 0.3)';
+            for (let i = 0; i < canvas.width; i += 20) {
+                ctx.fillRect(i, y, 10, 30);
+            }
+        }
+
+        function drawWave(y, progress) {
+            ctx.strokeStyle = 'rgba(59, 130, 246, 0.4)';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            
+            const wavelength = 40;
+            const amplitude = 10;
+            
+            for (let i = 0; i < canvas.width; i += 2) {
+                const waveY = y + Math.sin((i / wavelength) - progress * 10) * amplitude;
+                if (i === 0) {
+                    ctx.moveTo(i, waveY);
+                } else {
+                    ctx.lineTo(i, waveY);
+                }
+            }
+            ctx.stroke();
+        }
+
+        // Animation loop
+        function animate(timestamp) {
+            if (!lastTime) lastTime = timestamp;
+            const deltaTime = (timestamp - lastTime) / 1000;
+            lastTime = timestamp;
+            
+            if (state.isPlaying) {
+                state.currentTime += deltaTime;
+                if (state.currentTime >= state.duration) {
+                    state.isPlaying = false;
+                    state.currentTime = state.duration;
+                }
+                updateUI();
+                updateTimeline();
+            }
+            
+            drawScene();
+            animationId = requestAnimationFrame(animate);
+        }
+
+        // Update timeline
+        function updateTimeline() {
+            const progress = Math.min((state.currentTime / state.duration) * 100, 100);
+            document.getElementById('timelineBar').style.width = progress + '%';
+            document.getElementById('timelineLabel').textContent = state.currentTime.toFixed(2) + ' s';
+        }
+
+        // Event listeners
+        document.getElementById('mass').addEventListener('input', (e) => {
+            state.mass = parseFloat(e.target.value);
+            runSimulation();
+            updateUI();
+        });
+
+        document.getElementById('stiffness').addEventListener('input', (e) => {
+            state.stiffness = parseFloat(e.target.value);
+            runSimulation();
+            updateUI();
+        });
+
+        document.getElementById('damping').addEventListener('input', (e) => {
+            state.damping = parseFloat(e.target.value);
+            runSimulation();
+            updateUI();
+        });
+
+        document.getElementById('amplitude').addEventListener('input', (e) => {
+            state.amplitude = parseFloat(e.target.value);
+            runSimulation();
+        });
+
+        document.getElementById('frequency').addEventListener('input', (e) => {
+            state.frequency = parseFloat(e.target.value);
+            runSimulation();
+        });
+
+        document.getElementById('duration').addEventListener('input', (e) => {
+            state.duration = parseFloat(e.target.value);
+            runSimulation();
+        });
+
+        document.getElementById('playBtn').addEventListener('click', () => {
+            if (state.currentTime >= state.duration) {
+                state.currentTime = 0;
+            }
+            state.isPlaying = !state.isPlaying;
+            document.getElementById('playBtn').textContent = state.isPlaying ? '⏸️ Pausar' : '▶️ Reproducir';
+        });
+
+        document.getElementById('resetBtn').addEventListener('click', () => {
+            state.isPlaying = false;
+            state.currentTime = 0;
+            document.getElementById('playBtn').textContent = '▶️ Reproducir';
+            updateUI();
+            updateTimeline();
+        });
+
+        document.getElementById('timeline').addEventListener('click', (e) => {
+            const rect = e.target.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            state.currentTime = (x / rect.width) * state.duration;
+            state.isPlaying = false;
+            document.getElementById('playBtn').textContent = '▶️ Reproducir';
+            updateUI();
+            updateTimeline();
+        });
+
+        // Start animation
+        runSimulation();
+        updateUI();
+        animate(performance.now());
+    </script>
+</body>
+</html>
